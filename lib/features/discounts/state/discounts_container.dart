@@ -25,6 +25,10 @@ class _DiscountsContainerState extends State<DiscountsContainer> {
     });
   }
 
+  void _addDiscount(Discount newDiscount) {
+    setState(() => widget.discounts.add(newDiscount));
+  }
+
   void _onDiscountTap(Discount discount) {
     setState(() {
       _selectedDiscount = discount;
@@ -104,9 +108,7 @@ class _DiscountsContainerState extends State<DiscountsContainer> {
       case Screen.addForm:
         body = AddDiscountScreen(
           onSave: (newDiscount) {
-            setState(() {
-              widget.discounts.add(newDiscount);
-            });
+            _addDiscount(newDiscount);
           },
           onBack: _onBack,
         );
