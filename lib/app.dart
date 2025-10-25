@@ -35,6 +35,11 @@ class _PageContainerState extends State<PageContainer> {
       name: 'ВладиМир',
       avatarUrl: 'https://i.pravatar.cc/150?img=3',
     ),
+    User(
+      id: 'u3',
+      name: 'Кто-то-Некто',
+      avatarUrl: 'https://i.pravatar.cc/150?img=5',
+    ),
     currentUser
   ];
 
@@ -75,7 +80,7 @@ class _PageContainerState extends State<PageContainer> {
       oldPrice: '44 999',
       imageUrl: 'https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTzZD1CE-CZ2I3oXzPHGfFh14UwhuLreU8FAIFTJ2AmIEDsIV3-qZ-ghxraXwT1671VaoGuK55jxoXVLpB9_pnagZCHDBVq7i3aLS1zUBmyMQ96eY09wxBR',
       storeName: 'Эльдорадо',
-      author: users[1],
+      author: users[2],
       description: 'Автоматическая кофемашина с капучинатором и регулировкой помола.',
       isInFavourites: false,
       createdAt: DateTime.now().subtract(const Duration(days: 2, hours: 2)),
@@ -117,7 +122,7 @@ class _PageContainerState extends State<PageContainer> {
 }
 
 User currentUser = User(
-  id: '1',
-  name: 'Me',
-  avatarUrl: 'https://via.placeholder.com/50',
+  id: 'u1',
+  name: 'Minuano',
+  avatarUrl: 'https://i.pravatar.cc/150?img=4',
 );

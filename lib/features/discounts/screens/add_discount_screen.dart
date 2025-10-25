@@ -23,7 +23,7 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
   final _oldPriceController = TextEditingController();
   final _storeController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _imageUrlController = TextEditingController(); // 🆕
+  final _imageUrlController = TextEditingController();
 
   void _save() {
     if (_formKey.currentState!.validate()) {

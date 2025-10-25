@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app.dart';
@@ -62,9 +63,24 @@ class _ProfileScreenState extends State<ProfileScreen>
           Row(
             children: [
               const SizedBox(width: 16),
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: NetworkImage(currentUser.avatarUrl),
+              ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: currentUser.avatarUrl,
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                  progressIndicatorBuilder: (_, __, ___) => const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  errorWidget: (_, __, ___) => Container(
+                    width: 80,
+                    height: 80,
+                    color: const Color(0xFFFFDCBE),
+                    child: const Center(
+                      child: Icon(Icons.person, size: 60),
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(width: 16),
               Text(
