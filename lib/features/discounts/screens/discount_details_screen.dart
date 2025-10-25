@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:flutter/material.dart';
 import '../../../app.dart';
@@ -77,11 +78,21 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
                     // Фото
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        discount.imageUrl,
+                      child: CachedNetworkImage(
+                        imageUrl: discount.imageUrl,
                         width: 320,
                         height: 320,
                         fit: BoxFit.cover,
+                        progressIndicatorBuilder: (_, __, ___) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.broken_image,
+                            size: 40,
+                            color: Colors.grey,
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -149,10 +160,24 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              CircleAvatar(
-                                radius: 18,
-                                backgroundImage:
-                                NetworkImage(discount.author.avatarUrl),
+                              ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: currentUser.avatarUrl,
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  progressIndicatorBuilder: (_, __, ___) => const Center(
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                  errorWidget: (_, __, ___) => Container(
+                                    width: 80,
+                                    height: 80,
+                                    color: const Color(0xFFFFDCBE),
+                                    child: const Center(
+                                      child: Icon(Icons.person, size: 60),
+                                    ),
+                                  ),
+                                ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
