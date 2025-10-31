@@ -36,6 +36,20 @@ class _ProfileScreenState extends State<ProfileScreen>
     super.dispose();
   }
 
+  void _showEditProfileScreen() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditProfileScreen(user: currentUser, onBack: _onBack)
+      ),
+    );
+    setState(() {});
+  }
+
+  void _onBack() {
+    Navigator.pop(context);
+  }
+
   List<Discount> get favouriteDiscounts =>
       widget.discounts.where((d) => d.isInFavourites).toList();
 
@@ -59,15 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => EditProfileScreen(user: currentUser),
-                ),
-              );
-              setState(() {});
-            },
+            onPressed: _showEditProfileScreen
           ),
         ],
       ),

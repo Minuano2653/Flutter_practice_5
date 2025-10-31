@@ -4,8 +4,6 @@ import '../screens/discount_details_screen.dart';
 import '../models/discount.dart';
 import '../screens/discounts_list_screen.dart';
 
-enum Screen { list, addForm, viewForm }
-
 class DiscountsContainer extends StatefulWidget {
   final List<Discount> discounts;
 
@@ -16,23 +14,48 @@ class DiscountsContainer extends StatefulWidget {
 }
 
 class _DiscountsContainerState extends State<DiscountsContainer> {
-  Screen _currentScreen = Screen.list;
-  Discount? _selectedDiscount;
 
   void _showAddForm() {
-    setState(() {
-      _currentScreen = Screen.addForm;
-    });
+    Navigator.push(context, MaterialPageRoute(
+        builder: (context) => AddDiscountScreen(
+          onSave: (newDiscount) {
+            _addDiscount(newDiscount);
+            _onBack();
+          },
+          onBack: _onBack,
+        ),
+      ),
+    );
+  }
+
+  void _openDiscountDetails(Discount discount) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DiscountDetailsScreen(
+          discount: discount,
+          onBack: () {
+            Navigator.pop(context);
+          },
+          onToggleFavourite: (id) {
+            _onToggleFavourite(id);
+          },
+          onDelete: (id) {
+            _onDeleteFromDetails(id);
+            _onBack();
+          },
+        ),
+      ),
+    );
+  }
+
+  void _onBack() {
+    Navigator.pop(context);
   }
 
   void _addDiscount(Discount newDiscount) {
-    setState(() => widget.discounts.add(newDiscount));
-  }
-
-  void _onDiscountTap(Discount discount) {
     setState(() {
-      _selectedDiscount = discount;
-      _currentScreen = Screen.viewForm;
+      widget.discounts.add(newDiscount);
     });
   }
 
@@ -53,8 +76,6 @@ class _DiscountsContainerState extends State<DiscountsContainer> {
 
     setState(() {
       widget.discounts.removeAt(index);
-      _currentScreen = Screen.list;
-      _selectedDiscount = null;
     });
   }
 
@@ -84,48 +105,14 @@ class _DiscountsContainerState extends State<DiscountsContainer> {
     );
   }
 
-  void _onBack() {
-    setState(() {
-      _currentScreen = Screen.list;
-      _selectedDiscount = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    Widget body;
-
-    switch (_currentScreen) {
-      case Screen.list:
-        body = DiscountsListScreen(
-          discounts: widget.discounts,
-          onAdd: _showAddForm,
-          onToggleFavourite: _onToggleFavourite,
-          onDiscountTap: _onDiscountTap,
-          onDelete: _onDeleteDiscount,
-        );
-        break;
-      case Screen.addForm:
-        body = AddDiscountScreen(
-          onSave: (newDiscount) {
-            _addDiscount(newDiscount);
-          },
-          onBack: _onBack,
-        );
-        break;
-      case Screen.viewForm:
-        body = DiscountDetailsScreen(
-          discount: _selectedDiscount!,
-          onBack: _onBack,
-          onToggleFavourite: _onToggleFavourite,
-          onDelete: _onDeleteFromDetails,
-        );
-        break;
-    }
-
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: body,
+    return DiscountsListScreen(
+      discounts: widget.discounts,
+      onAdd: _showAddForm,
+      onToggleFavourite: _onToggleFavourite,
+      onDiscountTap: _openDiscountDetails,
+      onDelete: _onDeleteDiscount,
     );
   }
 }
