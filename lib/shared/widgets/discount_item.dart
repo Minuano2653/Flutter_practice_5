@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
+import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
 import '../../app.dart';
 import '../../features/discounts/models/discount.dart';
+import 'discount_image.dart';
 
 class DiscountItem extends StatelessWidget {
   final Discount discount;
@@ -42,27 +44,8 @@ class DiscountItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // --- Фото товара ---
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: CachedNetworkImage(
-                imageUrl: discount.imageUrl,
-                width: 110,
-                height: 110,
-                fit: BoxFit.cover,
-                progressIndicatorBuilder: (_, __, ___) => const Center(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                errorWidget: (context, error, stackTrace) {
-                  return Icon(
-                    Icons.broken_image,
-                    size: 40,
-                    color: Colors.grey,
-                  );
-                },
-              ),
-            ),
+            DiscountImage(imageUrl: discount.imageUrl),
             const SizedBox(width: 12),
-
             // --- Основная часть ---
             Expanded(
               child: Column(
@@ -149,25 +132,7 @@ class DiscountItem extends StatelessWidget {
                   // Автор и избранное
                   Row(
                     children: [
-                      ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: discount.author.avatarUrl,
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                          progressIndicatorBuilder: (_, __, ___) => const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                          errorWidget: (_, __, ___) => Container(
-                            width: 40,
-                            height: 40,
-                            color: const Color(0xFFFFDCBE),
-                            child: const Center(
-                              child: Icon(Icons.person, size: 28),
-                            ),
-                          ),
-                        ),
-                      ),
+                      AvatarImage(imageUrl: discount.author.avatarUrl, radius: 40),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -199,3 +164,5 @@ class DiscountItem extends StatelessWidget {
     );
   }
 }
+
+

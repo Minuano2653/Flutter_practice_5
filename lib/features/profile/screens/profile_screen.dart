@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fl_prac_5/features/discounts/widgets/discounts_list.dart';
+import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app.dart';
@@ -63,25 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           Row(
             children: [
               const SizedBox(width: 16),
-              ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: currentUser.avatarUrl,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  progressIndicatorBuilder: (_, __, ___) => const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  errorWidget: (_, __, ___) => Container(
-                    width: 80,
-                    height: 80,
-                    color: const Color(0xFFFFDCBE),
-                    child: const Center(
-                      child: Icon(Icons.person, size: 60),
-                    ),
-                  ),
-                ),
-              ),
+              AvatarImage(imageUrl: currentUser.avatarUrl, radius: 80),
               const SizedBox(width: 16),
               Text(
                 currentUser.name,
@@ -110,27 +94,14 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildDiscountList(List<Discount> discounts) {
     if (discounts.isEmpty) {
-      return const Center(
-        child: Text('Список пуст'),
-      );
+      return const Center(child: Text('Список пуст'));
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: discounts.length,
-      itemBuilder: (context, index) {
-        final discount = discounts[index];
-        return DiscountItem(
-          key: ValueKey(discount.id),
-          discount: discount,
-          onTap: (dsk) {
-
-          },
-          onDelete: (id) {},
-          onToggleFavourite: widget.onToggleFavourite,
-        );
-      },
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+    return DiscountsList(
+      discounts: discounts,
+      onDiscountTap: (dsk) {},
+      onToggleFavourite: widget.onToggleFavourite,
+      onDelete: (id) {},
     );
   }
 }
