@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../app.dart';
+import '../data/discounts_repository.dart';
 import '../models/discount.dart';
 
 class AddDiscountScreen extends StatefulWidget {

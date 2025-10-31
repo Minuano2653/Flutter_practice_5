@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../app.dart';
+import '../../discounts/data/discounts_repository.dart';
 import '../models/user.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User user;
+  final VoidCallback onBack;
 
-  const EditProfileScreen({super.key, required this.user});
+  const EditProfileScreen({
+    super.key,
+    required this.user,
+    required this.onBack,
+  });
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -33,21 +38,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final name = _nameController.text.trim();
     final avatar = _avatarController.text.trim();
 
-    // Проверка на пустые поля
     if (name.isEmpty || avatar.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Поля "Имя" и "Ссылка на аватар" не могут быть пустыми'),
+          content: Text(
+            'Поля "Имя" и "Ссылка на аватар" не могут быть пустыми',
+          ),
           backgroundColor: Colors.redAccent,
         ),
       );
       return;
     }
 
-    final updatedUser = widget.user.copyWith(
-      name: name,
-      avatarUrl: avatar,
-    );
+    final updatedUser = widget.user.copyWith(name: name, avatarUrl: avatar);
 
     currentUser = updatedUser;
     Navigator.pop(context);
@@ -60,6 +63,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Редактирование профиля'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: widget.onBack,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

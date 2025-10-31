@@ -1,10 +1,9 @@
 import 'package:fl_prac_5/features/discounts/widgets/discounts_list.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
-
-import '../../../app.dart';
+import 'package:go_router/go_router.dart';
 import '../../discounts/models/discount.dart';
-import 'edit_profile_screen.dart';
+import '../../discounts/data/discounts_repository.dart';
 
 class ProfileScreen extends StatefulWidget {
   final List<Discount> discounts;
@@ -60,12 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => EditProfileScreen(user: currentUser),
-                ),
-              );
+              await context.push('/profile/edit');
               setState(() {});
             },
           ),
