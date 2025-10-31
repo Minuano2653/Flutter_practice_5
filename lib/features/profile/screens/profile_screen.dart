@@ -1,11 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_prac_5/features/discounts/widgets/discounts_list.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app.dart';
 import '../../discounts/models/discount.dart';
-import '../../../shared/widgets/discount_item.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final List<Discount> discounts;
@@ -57,6 +56,20 @@ class _ProfileScreenState extends State<ProfileScreen>
             Tab(text: 'Мои публикации'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => EditProfileScreen(user: currentUser),
+                ),
+              );
+              setState(() {});
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

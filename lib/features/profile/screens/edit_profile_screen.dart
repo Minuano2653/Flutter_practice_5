@@ -1,4 +1,3 @@
-/*
 import 'package:flutter/material.dart';
 import '../../../app.dart';
 import '../models/user.dart';
@@ -50,7 +49,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       avatarUrl: avatar,
     );
 
-    currentUserNotifier.value = updatedUser;
+    currentUser = updatedUser;
     Navigator.pop(context);
   }
 
@@ -97,4 +96,3 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
-*/
