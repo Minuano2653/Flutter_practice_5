@@ -14,20 +14,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
       ),
-      home: const PageContainer(),
+      home: const PageContainer(currentIndex: 0),
     );
   }
 }
 
 class PageContainer extends StatefulWidget {
-  const PageContainer({super.key});
+  final int currentIndex;
+  const PageContainer({super.key, required this.currentIndex});
 
   @override
   State<PageContainer> createState() => _PageContainerState();
 }
 
 class _PageContainerState extends State<PageContainer> {
-  int _currentPageIndex = 0;
 
   final users = [
     User(
@@ -42,7 +42,6 @@ class _PageContainerState extends State<PageContainer> {
     ),
     currentUser
   ];
-
   late final demoDiscounts = [
     Discount(
       id: 'd1',
@@ -87,10 +86,11 @@ class _PageContainerState extends State<PageContainer> {
     ),
   ];
 
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentPageIndex = index;
-    });
+  void _onTapped(int index) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => PageContainer(currentIndex: index)),
+    );
   }
 
   @override
@@ -102,10 +102,9 @@ class _PageContainerState extends State<PageContainer> {
       onToggleFavourite: (String value) {  },)];
 
     return Scaffold(
-      body: pages[_currentPageIndex],
+      body: pages[widget.currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentPageIndex,
-        onTap: _onTabTapped,
+        onTap: _onTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.local_offer_outlined),
