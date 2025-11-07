@@ -63,6 +63,12 @@ class _ProfileScreenState extends State<ProfileScreen>
               setState(() {});
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              context.go('/login');
+            },
+          )
         ],
       ),
       body: Column(

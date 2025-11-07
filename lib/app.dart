@@ -4,6 +4,7 @@ import 'features/discounts/screens/add_discount_screen.dart';
 import 'features/discounts/screens/discount_details_screen.dart';
 import 'features/discounts/screens/discounts_list_screen.dart';
 import 'features/discounts/data/discounts_repository.dart';
+import 'features/login/screens/login_screen.dart';
 import 'features/profile/screens/edit_profile_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -19,8 +20,13 @@ class _MyAppState extends State<MyApp> {
   final DiscountsRepository discountsState = DiscountsRepository();
 
   late final GoRouter _router = GoRouter(
-    initialLocation: '/discounts',
+    initialLocation: '/login',
     routes: [
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+
       ShellRoute(
         builder: (context, state, child) => ScaffoldWithNavBar(child: child),
         routes: [
