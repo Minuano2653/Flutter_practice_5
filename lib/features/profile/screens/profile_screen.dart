@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app.dart';
 import '../../discounts/models/discount.dart';
+import '../../login/screens/login_screen.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -50,6 +51,13 @@ class _ProfileScreenState extends State<ProfileScreen>
     Navigator.pop(context);
   }
 
+  void _logout() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+  }
+
   List<Discount> get favouriteDiscounts =>
       widget.discounts.where((d) => d.isInFavourites).toList();
 
@@ -75,6 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             icon: const Icon(Icons.edit),
             onPressed: _showEditProfileScreen
           ),
+          IconButton(onPressed: _logout, icon: const Icon(Icons.logout))
         ],
       ),
       body: Column(

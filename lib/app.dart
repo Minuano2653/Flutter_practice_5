@@ -1,3 +1,4 @@
+import 'package:fl_prac_5/features/login/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'features/discounts/models/discount.dart';
 import 'features/discounts/state/discounts_container.dart';
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
       ),
-      home: const PageContainer(currentIndex: 0),
+      home: const LoginScreen(),
     );
   }
 }
@@ -28,6 +29,7 @@ class PageContainer extends StatefulWidget {
 }
 
 class _PageContainerState extends State<PageContainer> {
+  late int _currentIndex;
 
   final users = [
     User(
@@ -86,6 +88,13 @@ class _PageContainerState extends State<PageContainer> {
     ),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.currentIndex;
+  }
+
+
   void _onTapped(int index) {
     Navigator.pushReplacement(
       context,
@@ -98,12 +107,15 @@ class _PageContainerState extends State<PageContainer> {
     final pages = [
       DiscountsContainer(discounts: demoDiscounts),
       ProfileScreen(
-      discounts: demoDiscounts,
-      onToggleFavourite: (String value) {  },)];
+        discounts: demoDiscounts,
+        onToggleFavourite: (String value) {},
+      ),
+    ];
 
     return Scaffold(
-      body: pages[widget.currentIndex],
+      body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
         onTap: _onTapped,
         items: const [
           BottomNavigationBarItem(
