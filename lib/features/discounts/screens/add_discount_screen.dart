@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../../core/di/di_container.dart';
+import '../../profile/data/user_repository.dart';
 import '../data/discounts_repository.dart';
 import '../models/discount.dart';
 
 class AddDiscountScreen extends StatefulWidget {
-  final void Function(Discount newDiscount) onSave;
-  final VoidCallback onBack;
-
-  const AddDiscountScreen({
-    super.key,
-    required this.onSave,
-    required this.onBack,
-  });
+  const AddDiscountScreen({super.key});
 
   @override
   State<AddDiscountScreen> createState() => _AddDiscountScreenState();
@@ -25,6 +20,16 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
   final _descriptionController = TextEditingController();
   final _imageUrlController = TextEditingController();
 
+  late final DiscountsRepository _discountsRepository;
+  late final UserRepository _userRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _discountsRepository = getIt<DiscountsRepository>();
+    _userRepository = getIt<UserRepository>();
+  }
+
   void _save() {
     if (_formKey.currentState!.validate()) {
       final imageUrl = _imageUrlController.text.trim().isNotEmpty
@@ -38,14 +43,14 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
         oldPrice: _oldPriceController.text,
         imageUrl: imageUrl,
         storeName: _storeController.text,
-        author: currentUser,
+        author: _userRepository.currentUser,
         description: _descriptionController.text,
         isInFavourites: false,
         createdAt: DateTime.now(),
       );
 
-      widget.onSave(newDiscount);
-      widget.onBack();
+      _discountsRepository.addDiscount(newDiscount);
+      Navigator.pop(context);
     }
   }
 
@@ -65,10 +70,6 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Добавить скидку'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: widget.onBack,
-        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -122,7 +123,6 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
     );
   }
 
-  // 🆕 Поле без валидации (необязательное)
   Widget _buildOptionalField(
       TextEditingController controller,
       String label, {

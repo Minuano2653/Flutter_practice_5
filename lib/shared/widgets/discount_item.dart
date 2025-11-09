@@ -1,8 +1,9 @@
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
-import '../../features/discounts/data/discounts_repository.dart';
+import '../../core/di/di_container.dart';
 import '../../features/discounts/models/discount.dart';
+import '../../features/profile/data/user_repository.dart';
 import 'discount_image.dart';
 
 class DiscountItem extends StatelessWidget {
@@ -22,6 +23,7 @@ class DiscountItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final userRepository = getIt<UserRepository>();
 
     return InkWell(
       onTap: () => onTap(discount),
@@ -42,15 +44,12 @@ class DiscountItem extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- Фото товара ---
             DiscountImage(imageUrl: discount.imageUrl),
             const SizedBox(width: 12),
-            // --- Основная часть ---
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Время публикации
                   Row(
                     children: [
                       Expanded(
@@ -61,7 +60,7 @@ class DiscountItem extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (discount.author.id == currentUser.id)
+                      if (discount.author.id == userRepository.currentUser.id)
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                           onPressed: () => onDelete(discount.id),
@@ -70,7 +69,6 @@ class DiscountItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
 
-                  // Заголовок
                   Text(
                     discount.title,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -79,7 +77,6 @@ class DiscountItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Цена и магазин
                   Row(
                     children: [
                       Text(
@@ -119,7 +116,6 @@ class DiscountItem extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // Описание
                   Text(
                     discount.description,
                     maxLines: 2,
@@ -128,7 +124,6 @@ class DiscountItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  // Автор и избранное
                   Row(
                     children: [
                       AvatarImage(imageUrl: discount.author.avatarUrl, radius: 40),

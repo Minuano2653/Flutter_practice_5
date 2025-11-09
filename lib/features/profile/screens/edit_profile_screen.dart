@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../discounts/data/discounts_repository.dart';
-import '../models/user.dart';
+import '../../../core/di/di_container.dart';
+import '../data/user_repository.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  final User user;
-  final VoidCallback onBack;
-
-  const EditProfileScreen({
-    super.key,
-    required this.user,
-    required this.onBack,
-  });
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -19,12 +12,14 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _avatarController;
+  late final UserRepository _userRepository;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.user.name);
-    _avatarController = TextEditingController(text: widget.user.avatarUrl);
+    _userRepository = getIt<UserRepository>();
+    _nameController = TextEditingController(text: _userRepository.currentUser.name);
+    _avatarController = TextEditingController(text: _userRepository.currentUser.avatarUrl);
   }
 
   @override
@@ -50,9 +45,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return;
     }
 
-    final updatedUser = widget.user.copyWith(name: name, avatarUrl: avatar);
+    final updatedUser = _userRepository.currentUser.copyWith(
+      name: name,
+      avatarUrl: avatar,
+    );
+    _userRepository.updateUser(updatedUser);
 
-    currentUser = updatedUser;
     Navigator.pop(context);
   }
 
@@ -63,10 +61,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Редактирование профиля'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: widget.onBack,
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

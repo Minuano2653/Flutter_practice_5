@@ -1,22 +1,18 @@
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
+import '../../../core/di/di_container.dart';
 import '../../../shared/widgets/discount_image.dart';
-import '../models/discount.dart';
+import '../../profile/data/user_repository.dart';
 import '../data/discounts_repository.dart';
+import '../models/discount.dart';
 
 class DiscountDetailsScreen extends StatefulWidget {
-  final Discount discount;
-  final VoidCallback onBack;
-  final ValueChanged<String> onToggleFavourite;
-  final ValueChanged<String> onDelete;
+  final String discountId;
 
   const DiscountDetailsScreen({
     super.key,
-    required this.discount,
-    required this.onBack,
-    required this.onToggleFavourite,
-    required this.onDelete,
+    required this.discountId,
   });
 
   @override
@@ -24,38 +20,59 @@ class DiscountDetailsScreen extends StatefulWidget {
 }
 
 class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
-  late bool isInFavourites;
+  late final DiscountsRepository _discountsRepository;
+  late final UserRepository _userRepository;
+  late Discount _discount;
 
   @override
   void initState() {
     super.initState();
-    isInFavourites = widget.discount.isInFavourites;
+    _discountsRepository = getIt<DiscountsRepository>();
+    _userRepository = getIt<UserRepository>();
+    _discount = _discountsRepository.demoDiscounts.firstWhere(
+          (d) => d.id == widget.discountId,
+    );
   }
 
   void _handleFavourite() {
     setState(() {
-      isInFavourites = !isInFavourites;
+      _discountsRepository.toggleFavourite(widget.discountId);
+      _discount = _discountsRepository.demoDiscounts.firstWhere(
+            (d) => d.id == widget.discountId,
+      );
     });
-    widget.onToggleFavourite(widget.discount.id);
+  }
+
+  void _handleDelete() {
+    _discountsRepository.deleteDiscount(widget.discountId);
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final discount = widget.discount;
     final theme = Theme.of(context);
     final discountPercent = _calculateDiscountPercent(
-      discount.oldPrice,
-      discount.newPrice,
+      _discount.oldPrice,
+      _discount.newPrice,
     );
 
     return Scaffold(
-      appBar: _buildAppBar(discount),
+      appBar: AppBar(
+        title: const Text('Информация о скидке'),
+        actions: [
+          if (_discount.author.id == _userRepository.currentUser.id)
+            IconButton(
+              onPressed: _handleDelete,
+              icon: const Icon(Icons.delete),
+            ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDiscountCard(discount, discountPercent),
+            _buildDiscountCard(_discount, discountPercent),
             const SizedBox(height: 24),
             Text(
               'Подробнее о скидке',
@@ -66,29 +83,12 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              discount.description,
+              _discount.description,
               style: theme.textTheme.bodyLarge?.copyWith(fontSize: 18),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  AppBar _buildAppBar(Discount discount) {
-    return AppBar(
-      title: const Text('Информация о скидке'),
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: widget.onBack,
-      ),
-      actions: [
-        if (discount.author.id == currentUser.id)
-          IconButton(
-            onPressed: () => widget.onDelete(discount.id),
-            icon: const Icon(Icons.delete),
-          ),
-      ],
     );
   }
 
@@ -101,17 +101,13 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDiscountImage(discount),
+            DiscountImage(imageUrl: discount.imageUrl, width: 320, height: 320),
             const SizedBox(width: 16),
             Expanded(child: _buildDiscountInfo(discount, discountPercent)),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildDiscountImage(Discount discount) {
-    return DiscountImage(imageUrl: discount.imageUrl, width: 320, height: 320);
   }
 
   Widget _buildDiscountInfo(Discount discount, double discountPercent) {
@@ -192,16 +188,16 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
         Expanded(
           child: Text(
             discount.author.name,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         IconButton(
           onPressed: _handleFavourite,
           icon: Icon(
-            isInFavourites ? Icons.favorite : Icons.favorite_border,
-            color: isInFavourites ? Colors.orange : Colors.grey,
+            _discount.isInFavourites ? Icons.favorite : Icons.favorite_border,
+            color: _discount.isInFavourites ? Colors.orange : Colors.grey,
             size: 30,
           ),
         ),
