@@ -1,7 +1,7 @@
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
-import '../../app.dart';
+import '../../features/discounts/data/discounts_repository.dart';
 import '../../features/discounts/models/discount.dart';
 import 'discount_image.dart';
 
