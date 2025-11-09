@@ -122,7 +122,6 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
     );
   }
 
-  // 🆕 Поле без валидации (необязательное)
   Widget _buildOptionalField(
       TextEditingController controller,
       String label, {

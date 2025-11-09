@@ -1,9 +1,9 @@
+import 'package:fl_prac_5/app_dependencies.dart';
 import 'package:fl_prac_5/scaffold_with_navbar.dart';
 import 'package:flutter/material.dart';
 import 'features/discounts/screens/add_discount_screen.dart';
 import 'features/discounts/screens/discount_details_screen.dart';
 import 'features/discounts/screens/discounts_list_screen.dart';
-import 'features/discounts/data/discounts_repository.dart';
 import 'features/login/screens/login_screen.dart';
 import 'features/profile/screens/edit_profile_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
@@ -17,76 +17,82 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final DiscountsRepository discountsState = DiscountsRepository();
+  late final GoRouter _router;
 
-  late final GoRouter _router = GoRouter(
-    initialLocation: '/login',
-    routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+  @override
+  void initState() {
+    super.initState();
 
-      ShellRoute(
-        builder: (context, state, child) => ScaffoldWithNavBar(child: child),
-        routes: [
-          GoRoute(
-            path: '/discounts',
-            builder: (context, state) => DiscountsListScreen(
-              discounts: discountsState.demoDiscounts,
-              onDiscountTap: (discount) =>
-                  context.push('/discounts/${discount.id}'),
-              onToggleFavourite: discountsState.toggleFavourite,
-              onDelete: discountsState.deleteDiscount,
-              onAdd: () => context.push('/discounts/add'),
-            ),
-            routes: [
-              GoRoute(
-                path: 'add',
-                builder: (context, state) => AddDiscountScreen(
-                  onSave: discountsState.addDiscount,
-                  onBack: () => context.pop(),
+    _router = GoRouter(
+      initialLocation: '/login',
+      routes: [
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+        ShellRoute(
+          builder: (context, state, child) => ScaffoldWithNavBar(child: child),
+          routes: [
+            GoRoute(
+              path: '/discounts',
+              builder: (context, state) {
+                final repo = DependenciesProvider.of(context).discountsRepository;
+                return DiscountsListScreen(
+                  discounts: repo.demoDiscounts,
+                  onDiscountTap: (discount) => context.push('/discounts/${discount.id}'),
+                  onToggleFavourite: repo.toggleFavourite,
+                  onDelete: repo.deleteDiscount,
+                  onAdd: () => context.push('/discounts/add'),
+                );
+              },
+              routes: [
+                GoRoute(
+                  path: 'add',
+                  builder: (context, state) {
+                    final repo = DependenciesProvider.of(context).discountsRepository;
+                    return AddDiscountScreen(
+                      onSave: repo.addDiscount,
+                      onBack: () => context.pop(),
+                    );
+                  },
                 ),
-              ),
-              GoRoute(
-                path: ':id',
-                builder: (context, state) {
-                  final id = state.pathParameters['id']!;
-                  final discount = discountsState.demoDiscounts.firstWhere(
-                    (d) => d.id == id,
-                  );
-                  return DiscountDetailsScreen(
-                    discount: discount,
-                    onBack: () => context.pop(),
-                    onToggleFavourite: discountsState.toggleFavourite,
-                    onDelete: discountsState.deleteDiscount,
-                  );
-                },
-              ),
-            ],
-          ),
-          GoRoute(
-            path: '/profile',
-            builder: (context, state) => ProfileScreen(
-              discounts: discountsState.demoDiscounts,
-              onToggleFavourite: discountsState.toggleFavourite,
+                GoRoute(
+                  path: ':id',
+                  builder: (context, state) {
+                    final repo = DependenciesProvider.of(context).discountsRepository;
+                    final id = state.pathParameters['id']!;
+                    final discount = repo.demoDiscounts.firstWhere((d) => d.id == id);
+                    return DiscountDetailsScreen(
+                      discount: discount,
+                      onBack: () => context.pop(),
+                      onToggleFavourite: repo.toggleFavourite,
+                      onDelete: repo.deleteDiscount,
+                    );
+                  },
+                ),
+              ],
             ),
-            routes: [
-              GoRoute(
-                path: 'edit',
-                builder: (context, state) {
-                  return EditProfileScreen(
-                    user: currentUser,
-                    onBack: () => context.pop(),
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    ],
-  );
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) {
+                final repo = DependenciesProvider.of(context).discountsRepository;
+                return ProfileScreen(
+                  discounts: repo.demoDiscounts,
+                  onToggleFavourite: repo.toggleFavourite,
+                );
+              },
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  builder: (context, state) => const EditProfileScreen(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
