@@ -1,17 +1,13 @@
 import '../../profile/models/user.dart';
 import '../models/discount.dart';
 
-User currentUser = User(
-  id: 'u1',
-  name: 'Minuano',
-  avatarUrl: 'https://i.pravatar.cc/150?img=4',
-);
-
 class DiscountsRepository {
-  final List<Discount> demoDiscounts = [];
+  final List<Discount> _demoDiscounts = [];
+
+  List<Discount> get demoDiscounts => _demoDiscounts;
 
   DiscountsRepository() {
-    demoDiscounts.addAll(_createDemoDiscounts());
+    _demoDiscounts.addAll(_createDemoDiscounts());
   }
 
   List<Discount> _createDemoDiscounts() {
@@ -26,7 +22,11 @@ class DiscountsRepository {
         name: 'Кто-то-Некто',
         avatarUrl: 'https://i.pravatar.cc/150?img=5',
       ),
-      currentUser,
+      User(
+        id: 'u1',
+        name: 'Minuano',
+        avatarUrl: 'https://i.pravatar.cc/150?img=4',
+      ),
     ];
 
     return [
@@ -36,11 +36,11 @@ class DiscountsRepository {
         newPrice: '8 999 ₽',
         oldPrice: '12 999 ₽',
         imageUrl:
-            'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSAneAbfbWM-kCT2pn15IWwo5acFfGnCbcMIqjWgexi_9IOOm_N4WxmusT_qv5FCIpz__QgXunWft6ig9aCMRGlcEFiVsilj2oherNyAuiRddAdMTB5aK5lTz0',
+        'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSAneAbfbWM-kCT2pn15IWwo5acFfGnCbcMIqjWgexi_9IOOm_N4WxmusT_qv5FCIpz__QgXunWft6ig9aCMRGlcEFiVsilj2oherNyAuiRddAdMTB5aK5lTz0',
         storeName: 'SportMaster',
         author: users[0],
         description:
-            'Скидка только в МОСКВЕ!'
+        'Скидка только в МОСКВЕ!'
             '\nМужские повседневные кроссовки Nike AIR MAX 90 — это икона 90-х, сочетающая стиль и удобство. Созданные с видимой амортизацией Air и вафельной подошвой, они предлагают легендарный комфорт и долговечность. Изготовлены из 17% искусственной кожи, 38% синтетики и 45% текстиля. Яркие цветовые решения и уникальный дизайн делают их идеальными для тех, кто хочет сделать стильное заявление.'
             '\n- Видимая воздушная амортизация обеспечивает исключительный комфорт и поддержку, идеальны для повседневного использования.'
             '\n- Резиновая вафельная подошва гарантирует надежное сцепление и долговечность, придавая традиционный стиль.'
@@ -56,7 +56,7 @@ class DiscountsRepository {
         newPrice: '24 990',
         oldPrice: '29 990',
         imageUrl:
-            'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT-1Dz4Xxtxen4KpkkNzhzisKOByJbguizhTOukbtJ5e92-n4lqgbyMGZdPzAS_qxP-ahqpWNkGnramVw6kLOEt_I37o-cs61z_FiQMCdygg8RuIyYrRDL8aQ',
+        'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcT-1Dz4Xxtxen4KpkkNzhzisKOByJbguizhTOukbtJ5e92-n4lqgbyMGZdPzAS_qxP-ahqpWNkGnramVw6kLOEt_I37o-cs61z_FiQMCdygg8RuIyYrRDL8aQ',
         storeName: 'M.Video',
         author: users[1],
         description: 'Флагманские наушники с шумоподавлением.',
@@ -72,24 +72,24 @@ class DiscountsRepository {
         storeName: 'Эльдорадо',
         author: users[2],
         description:
-            'Автоматическая кофемашина с капучинатором и регулировкой помола.',
+        'Автоматическая кофемашина с капучинатором и регулировкой помола.',
         isInFavourites: false,
         createdAt: DateTime.now().subtract(const Duration(days: 2, hours: 2)),
       ),
     ];
   }
 
-  void addDiscount(Discount newDiscount) => demoDiscounts.add(newDiscount);
+  void addDiscount(Discount newDiscount) => _demoDiscounts.add(newDiscount);
 
   void deleteDiscount(String id) {
-    demoDiscounts.removeWhere((d) => d.id == id);
+    _demoDiscounts.removeWhere((d) => d.id == id);
   }
 
   void toggleFavourite(String id) {
-    final index = demoDiscounts.indexWhere((d) => d.id == id);
+    final index = _demoDiscounts.indexWhere((d) => d.id == id);
     if (index != -1) {
-      demoDiscounts[index] = demoDiscounts[index].copyWith(
-        isInFavourites: !demoDiscounts[index].isInFavourites,
+      _demoDiscounts[index] = _demoDiscounts[index].copyWith(
+        isInFavourites: !_demoDiscounts[index].isInFavourites,
       );
     }
   }

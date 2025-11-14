@@ -2,18 +2,13 @@ import 'package:fl_prac_5/features/discounts/widgets/discounts_list.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../discounts/models/discount.dart';
+import '../../../core/di/di_container.dart';
 import '../../discounts/data/discounts_repository.dart';
+import '../../discounts/models/discount.dart';
+import '../data/user_repository.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final List<Discount> discounts;
-  final ValueChanged<String> onToggleFavourite;
-
-  const ProfileScreen({
-    super.key,
-    required this.discounts,
-    required this.onToggleFavourite,
-  });
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -22,11 +17,15 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late final DiscountsRepository _discountsRepository;
+  late final UserRepository _userRepository;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _discountsRepository = getIt<DiscountsRepository>();
+    _userRepository = getIt<UserRepository>();
   }
 
   @override
@@ -36,14 +35,16 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   List<Discount> get favouriteDiscounts =>
-      widget.discounts.where((d) => d.isInFavourites).toList();
+      _discountsRepository.demoDiscounts.where((d) => d.isInFavourites).toList();
 
-  List<Discount> get myDiscounts =>
-      widget.discounts.where((d) => d.author.id == currentUser.id).toList();
+  List<Discount> get myDiscounts => _discountsRepository.demoDiscounts
+      .where((d) => d.author.id == _userRepository.currentUser.id)
+      .toList();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final currentUser = _userRepository.currentUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -74,7 +75,6 @@ class _ProfileScreenState extends State<ProfileScreen>
       body: Column(
         children: [
           const SizedBox(height: 16),
-          // Аватарка и имя
           Row(
             children: [
               const SizedBox(width: 16),
@@ -90,7 +90,6 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           const SizedBox(height: 16),
           const Divider(height: 1),
-          // Таблы
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -113,7 +112,11 @@ class _ProfileScreenState extends State<ProfileScreen>
     return DiscountsList(
       discounts: discounts,
       onDiscountTap: (dsk) {},
-      onToggleFavourite: widget.onToggleFavourite,
+      onToggleFavourite: (id) {
+        setState(() {
+          _discountsRepository.toggleFavourite(id);
+        });
+      },
       onDelete: (id) {},
     );
   }
