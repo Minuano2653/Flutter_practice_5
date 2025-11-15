@@ -1,32 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/di/di_container.dart';
-import '../data/discounts_repository.dart';
-import '../models/discount.dart';
+import '../controllers/discounts_list_controller.dart';
 import '../widgets/discounts_list.dart';
 
-class DiscountsListScreen extends StatefulWidget {
+class DiscountsListScreen extends ConsumerWidget {
   const DiscountsListScreen({super.key});
 
   @override
-  State<DiscountsListScreen> createState() => _DiscountsListScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final discounts = ref.watch(discountsListControllerProvider);
 
-class _DiscountsListScreenState extends State<DiscountsListScreen> {
-  late final DiscountsRepository _discountsRepository;
-
-  @override
-  void initState() {
-    super.initState();
-    if (getIt.isRegistered<DiscountsRepository>()) {
-      _discountsRepository = getIt<DiscountsRepository>();
-    } else {
-      print('Ошибка DiscountsRepository не зарегистрирован в GetIt!');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Скидки'),
@@ -34,23 +18,22 @@ class _DiscountsListScreenState extends State<DiscountsListScreen> {
           IconButton(
             onPressed: () => context.push('/discounts/add'),
             icon: const Icon(Icons.add),
-          )
+          ),
         ],
       ),
-      body: DiscountsList(
-        discounts: _discountsRepository.demoDiscounts,
-        onToggleFavourite: (id) {
-          setState(() {
-            _discountsRepository.toggleFavourite(id);
-          });
-        },
-        onDiscountTap: (discount) => context.push('/discounts/${discount.id}'),
-        onDelete: (id) {
-          setState(() {
-            _discountsRepository.deleteDiscount(id);
-          });
-        },
-      ),
+      body: discounts.isEmpty
+          ? const Center(child: Text('Скидок пока нет'))
+          : DiscountsList(
+              discounts: discounts,
+              onToggleFavourite: (id) {
+                ref.read(discountsListControllerProvider.notifier).toggleFavourite(id);
+              },
+              onDiscountTap: (discount) =>
+                  context.push('/discounts/${discount.id}'),
+              onDelete: (id) {
+                ref.read(discountsListControllerProvider.notifier).deleteDiscount(id);
+              },
+            ),
     );
   }
 }

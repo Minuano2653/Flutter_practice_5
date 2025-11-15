@@ -1,49 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class LoginScreen extends StatefulWidget {
+import '../../profile/models/user.dart';
+import '../controllers/auth_controller.dart';
+
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loginController = TextEditingController();
+    final passwordController = TextEditingController();
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _loginController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _loading = false;
+    ref.watch(authControllerProvider);
 
-  static const mockLogin = 'minuano';
-  static const mockPassword = '1234';
-
-  void _login() async {
-    final login = _loginController.text.trim();
-    final pass = _passwordController.text.trim();
-
-    if (login.isEmpty || pass.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Введите логин и пароль')),
-      );
-      return;
-    }
-
-    if (login != mockLogin || pass != mockPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Неверный логин или пароль')),
-      );
-      return;
-    }
-
-    setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    if (!mounted) return;
-    context.go('/discounts');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.primary;
+    ref.listen<AsyncValue<User?>>(
+      authControllerProvider,
+          (previous, next) {
+        if (next.hasError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(next.error.toString())),
+          );
+        } else if (!next.isLoading && next.hasValue) {
+          context.go('/discounts');
+        }
+      },
+    );
 
     return Scaffold(
       body: Center(
@@ -52,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.local_offer_rounded, size: 80, color: color),
+              Icon(Icons.local_offer_rounded, size: 80, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 16),
               Text(
                 'Добро пожаловать!',
@@ -61,39 +44,45 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 32),
 
               TextField(
-                controller: _loginController,
+                controller: loginController,
                 decoration: InputDecoration(
                   labelText: 'Логин',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                   prefixIcon: const Icon(Icons.person_outline),
                 ),
               ),
               const SizedBox(height: 16),
 
               TextField(
-                controller: _passwordController,
+                controller: passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Пароль',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                   prefixIcon: const Icon(Icons.lock_outline),
                 ),
               ),
               const SizedBox(height: 24),
 
               ElevatedButton(
-                onPressed: _loading ? null : _login,
+                onPressed: () {
+                  final login = loginController.text.trim();
+                  final pass = passwordController.text.trim();
+
+                  if (login.isEmpty || pass.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Введите логин и пароль')),
+                    );
+                    return;
+                  }
+
+                  ref.read(authControllerProvider.notifier).login(login, pass);
+                },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: _loading
+                child: ref.watch(authControllerProvider).isLoading
                     ? const CircularProgressIndicator()
                     : const Text('Войти', style: TextStyle(fontSize: 18)),
               ),

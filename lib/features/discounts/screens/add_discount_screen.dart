@@ -1,96 +1,86 @@
 import 'package:flutter/material.dart';
-import '../../../core/di/di_container.dart';
-import '../../profile/data/user_repository.dart';
-import '../data/discounts_repository.dart';
-import '../models/discount.dart';
 
-class AddDiscountScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../login/controllers/auth_controller.dart';
+import '../models/discount.dart';
+import '../controllers/discounts_list_controller.dart';
+
+class AddDiscountScreen extends ConsumerStatefulWidget {
   const AddDiscountScreen({super.key});
 
   @override
-  State<AddDiscountScreen> createState() => _AddDiscountScreenState();
+  ConsumerState<AddDiscountScreen> createState() => _AddDiscountScreenState();
 }
 
-class _AddDiscountScreenState extends State<AddDiscountScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _newPriceController = TextEditingController();
-  final _oldPriceController = TextEditingController();
-  final _storeController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _imageUrlController = TextEditingController();
+class _AddDiscountScreenState extends ConsumerState<AddDiscountScreen> {
+  final formKey = GlobalKey<FormState>();
 
-  late final DiscountsRepository _discountsRepository;
-  late final UserRepository _userRepository;
-
-  @override
-  void initState() {
-    super.initState();
-    _discountsRepository = getIt<DiscountsRepository>();
-    _userRepository = getIt<UserRepository>();
-  }
-
-  void _save() {
-    if (_formKey.currentState!.validate()) {
-      final imageUrl = _imageUrlController.text.trim().isNotEmpty
-          ? _imageUrlController.text.trim()
-          : '';
-
-      final newDiscount = Discount(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: _titleController.text,
-        newPrice: _newPriceController.text,
-        oldPrice: _oldPriceController.text,
-        imageUrl: imageUrl,
-        storeName: _storeController.text,
-        author: _userRepository.currentUser,
-        description: _descriptionController.text,
-        isInFavourites: false,
-        createdAt: DateTime.now(),
-      );
-
-      _discountsRepository.addDiscount(newDiscount);
-      Navigator.pop(context);
-    }
-  }
+  final titleController = TextEditingController();
+  final newPriceController = TextEditingController();
+  final oldPriceController = TextEditingController();
+  final storeController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final imageUrlController = TextEditingController();
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _newPriceController.dispose();
-    _oldPriceController.dispose();
-    _storeController.dispose();
-    _descriptionController.dispose();
-    _imageUrlController.dispose();
+    titleController.dispose();
+    newPriceController.dispose();
+    oldPriceController.dispose();
+    storeController.dispose();
+    descriptionController.dispose();
+    imageUrlController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    void save() {
+      final currentUser = ref.read(authControllerProvider).value;
+
+      if (formKey.currentState?.validate() != true || currentUser == null) return;
+
+      final newDiscount = Discount(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: titleController.text.trim(),
+        newPrice: newPriceController.text.trim(),
+        oldPrice: oldPriceController.text.trim(),
+        imageUrl: imageUrlController.text.trim(),
+        storeName: storeController.text.trim(),
+        author: currentUser,
+        description: descriptionController.text.trim(),
+        isInFavourites: false,
+        createdAt: DateTime.now(),
+      );
+
+      ref.read(discountsListControllerProvider.notifier).addDiscount(newDiscount);
+
+      context.pop();
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Добавить скидку'),
-      ),
+      appBar: AppBar(title: const Text('Добавить скидку')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             children: [
-              _buildTextField(_titleController, 'Название публикации'),
+              _buildTextField(titleController, 'Название публикации'),
               const SizedBox(height: 12),
-              _buildTextField(_newPriceController, 'Новая цена', keyboardType: TextInputType.number),
+              _buildTextField(newPriceController, 'Новая цена', keyboardType: TextInputType.number),
               const SizedBox(height: 12),
-              _buildTextField(_oldPriceController, 'Старая цена', keyboardType: TextInputType.number),
+              _buildTextField(oldPriceController, 'Старая цена', keyboardType: TextInputType.number),
               const SizedBox(height: 12),
-              _buildTextField(_storeController, 'Магазин'),
+              _buildTextField(storeController, 'Магазин'),
               const SizedBox(height: 12),
-              _buildTextField(_descriptionController, 'Описание', maxLines: 4),
+              _buildTextField(descriptionController, 'Описание', maxLines: 4),
               const SizedBox(height: 12),
-              _buildOptionalField(_imageUrlController, 'Ссылка на изображение'),
+              _buildOptionalField(imageUrlController, 'Ссылка на изображение'),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _save,
+                onPressed: save,
                 child: const Text('Сохранить'),
               ),
             ],

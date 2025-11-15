@@ -1,68 +1,58 @@
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
-import '../../../core/di/di_container.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:collection/collection.dart';
 import '../../../shared/widgets/discount_image.dart';
-import '../../profile/data/user_repository.dart';
-import '../data/discounts_repository.dart';
+import '../../login/controllers/auth_controller.dart';
+import '../controllers/discounts_list_controller.dart';
 import '../models/discount.dart';
 
-class DiscountDetailsScreen extends StatefulWidget {
+class DiscountDetailsScreen extends ConsumerWidget {
   final String discountId;
 
-  const DiscountDetailsScreen({
-    super.key,
-    required this.discountId,
-  });
+  const DiscountDetailsScreen({super.key, required this.discountId});
+
+  void _handleFavourite(WidgetRef ref) {
+    ref.read(discountsListControllerProvider.notifier).toggleFavourite(discountId);
+  }
+
+  void _handleDelete(BuildContext context, WidgetRef ref) {
+    ref.read(discountsListControllerProvider.notifier).deleteDiscount(discountId);
+    context.pop();
+  }
 
   @override
-  State<DiscountDetailsScreen> createState() => _DiscountDetailsScreenState();
-}
-
-class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
-  late final DiscountsRepository _discountsRepository;
-  late final UserRepository _userRepository;
-  late Discount _discount;
-
-  @override
-  void initState() {
-    super.initState();
-    _discountsRepository = getIt<DiscountsRepository>();
-    _userRepository = getIt<UserRepository>();
-    _discount = _discountsRepository.demoDiscounts.firstWhere(
-          (d) => d.id == widget.discountId,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final discount = ref.watch(
+      discountsListControllerProvider.select(
+        (state) => state.firstWhereOrNull((d) => d.id == discountId),
+      ),
     );
-  }
 
-  void _handleFavourite() {
-    setState(() {
-      _discountsRepository.toggleFavourite(widget.discountId);
-      _discount = _discountsRepository.demoDiscounts.firstWhere(
-            (d) => d.id == widget.discountId,
+    final currentUserId = ref.watch(authControllerProvider).value?.id;
+
+    if (discount == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Скидка не найдена')),
+        body: const Center(child: Text('Скидка не найдена или была удалена')),
       );
-    });
-  }
+    }
 
-  void _handleDelete() {
-    _discountsRepository.deleteDiscount(widget.discountId);
-    Navigator.pop(context);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final discountPercent = _calculateDiscountPercent(
-      _discount.oldPrice,
-      _discount.newPrice,
+      discount.oldPrice,
+      discount.newPrice,
     );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Информация о скидке'),
         actions: [
-          if (_discount.author.id == _userRepository.currentUser.id)
+          if (currentUserId != null && discount.author.id == currentUserId)
             IconButton(
-              onPressed: _handleDelete,
+              onPressed: () => _handleDelete(context, ref),
               icon: const Icon(Icons.delete),
             ),
         ],
@@ -72,7 +62,7 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDiscountCard(_discount, discountPercent),
+            _buildDiscountCard(discount, discountPercent, context, ref),
             const SizedBox(height: 24),
             Text(
               'Подробнее о скидке',
@@ -83,7 +73,7 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              _discount.description,
+              discount.description,
               style: theme.textTheme.bodyLarge?.copyWith(fontSize: 18),
             ),
           ],
@@ -92,7 +82,23 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
     );
   }
 
-  Widget _buildDiscountCard(Discount discount, double discountPercent) {
+  double _calculateDiscountPercent(String oldPrice, String newPrice) {
+    try {
+      final oldVal = double.parse(oldPrice.replaceAll(RegExp(r'[^0-9.]'), ''));
+      final newVal = double.parse(newPrice.replaceAll(RegExp(r'[^0-9.]'), ''));
+      if (oldVal <= 0) return 0;
+      return ((oldVal - newVal) / oldVal * 100).roundToDouble();
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  Widget _buildDiscountCard(
+    Discount discount,
+    double discountPercent,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -103,14 +109,26 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
           children: [
             DiscountImage(imageUrl: discount.imageUrl, width: 320, height: 320),
             const SizedBox(width: 16),
-            Expanded(child: _buildDiscountInfo(discount, discountPercent)),
+            Expanded(
+              child: _buildDiscountInfo(
+                discount,
+                discountPercent,
+                context,
+                ref,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDiscountInfo(Discount discount, double discountPercent) {
+  Widget _buildDiscountInfo(
+    Discount discount,
+    double discountPercent,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     final theme = Theme.of(context);
 
     return Column(
@@ -139,7 +157,7 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        _buildAuthorRow(discount),
+        _buildAuthorRow(discount, context, ref),
       ],
     );
   }
@@ -180,7 +198,11 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
     );
   }
 
-  Widget _buildAuthorRow(Discount discount) {
+  Widget _buildAuthorRow(
+    Discount discount,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     return Row(
       children: [
         AvatarImage(imageUrl: discount.author.avatarUrl, radius: 80),
@@ -188,31 +210,20 @@ class _DiscountDetailsScreenState extends State<DiscountDetailsScreen> {
         Expanded(
           child: Text(
             discount.author.name,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
           ),
         ),
         IconButton(
-          onPressed: _handleFavourite,
+          onPressed: () => _handleFavourite(ref),
           icon: Icon(
-            _discount.isInFavourites ? Icons.favorite : Icons.favorite_border,
-            color: _discount.isInFavourites ? Colors.orange : Colors.grey,
+            discount.isInFavourites ? Icons.favorite : Icons.favorite_border,
+            color: discount.isInFavourites ? Colors.orange : Colors.grey,
             size: 30,
           ),
         ),
       ],
     );
-  }
-
-  double _calculateDiscountPercent(String oldPrice, String newPrice) {
-    try {
-      final oldVal = double.parse(oldPrice.replaceAll(RegExp(r'[^0-9.]'), ''));
-      final newVal = double.parse(newPrice.replaceAll(RegExp(r'[^0-9.]'), ''));
-      if (oldVal <= 0) return 0;
-      return ((oldVal - newVal) / oldVal * 100).roundToDouble();
-    } catch (_) {
-      return 0;
-    }
   }
 }

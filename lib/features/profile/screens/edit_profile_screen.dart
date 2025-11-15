@@ -1,32 +1,25 @@
 import 'package:flutter/material.dart';
-import '../../../core/di/di_container.dart';
-import '../data/user_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../login/controllers/auth_controller.dart';
 
-class EditProfileScreen extends StatefulWidget {
+class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _avatarController;
-  late final UserRepository _userRepository;
 
   @override
   void initState() {
     super.initState();
-    _userRepository = getIt<UserRepository>();
-    _nameController = TextEditingController(text: _userRepository.currentUser.name);
-    _avatarController = TextEditingController(text: _userRepository.currentUser.avatarUrl);
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _avatarController.dispose();
-    super.dispose();
+    final currentUser = ref.read(authControllerProvider).value;
+    _nameController = TextEditingController(text: currentUser?.name ?? '');
+    _avatarController = TextEditingController(text: currentUser?.avatarUrl ?? '');
   }
 
   void _saveChanges() {
@@ -45,14 +38,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return;
     }
 
-    final updatedUser = _userRepository.currentUser.copyWith(
+    final currentUser = ref.read(authControllerProvider).value;
+    if (currentUser == null) return;
+
+    final updatedUser = currentUser.copyWith(
       name: name,
       avatarUrl: avatar,
     );
-    _userRepository.updateUser(updatedUser);
-
-    Navigator.pop(context);
+    ref.read(authControllerProvider.notifier).updateUser(updatedUser);
+    context.pop();
   }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _avatarController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
