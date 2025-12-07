@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/discounts_cubit.dart';
-import '../data/user_cubit.dart';
+import '../../profile/data/user_cubit.dart';
 import '../models/discount.dart';
 import '../widgets/discounts_list.dart';
 

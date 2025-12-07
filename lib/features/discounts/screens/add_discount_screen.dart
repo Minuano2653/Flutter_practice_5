@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/di/di_container.dart';
-import '../../profile/data/user_repository.dart';
 import '../data/discounts_cubit.dart';
-import '../data/discounts_repository.dart';
-import '../data/user_cubit.dart';
+import '../../profile/data/user_cubit.dart';
 import '../models/discount.dart';
 
 class AddDiscountScreen extends StatefulWidget {
@@ -63,9 +60,7 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Добавить скидку'),
-      ),
+      appBar: AppBar(title: const Text('Добавить скидку')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -74,11 +69,17 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
             children: [
               _buildTextField(_titleController, 'Название публикации'),
               const SizedBox(height: 12),
-              _buildTextField(_newPriceController, 'Новая цена',
-                  keyboardType: TextInputType.number),
+              _buildTextField(
+                _newPriceController,
+                'Новая цена',
+                keyboardType: TextInputType.number,
+              ),
               const SizedBox(height: 12),
-              _buildTextField(_oldPriceController, 'Старая цена',
-                  keyboardType: TextInputType.number),
+              _buildTextField(
+                _oldPriceController,
+                'Старая цена',
+                keyboardType: TextInputType.number,
+              ),
               const SizedBox(height: 12),
               _buildTextField(_storeController, 'Магазин'),
               const SizedBox(height: 12),
@@ -86,10 +87,7 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
               const SizedBox(height: 12),
               _buildOptionalField(_imageUrlController, 'Ссылка на изображение'),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _save,
-                child: const Text('Сохранить'),
-              ),
+              ElevatedButton(onPressed: _save, child: const Text('Сохранить')),
             ],
           ),
         ),
@@ -98,11 +96,11 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
   }
 
   Widget _buildTextField(
-      TextEditingController controller,
-      String label, {
-        int maxLines = 1,
-        TextInputType keyboardType = TextInputType.text,
-      }) {
+    TextEditingController controller,
+    String label, {
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
@@ -121,11 +119,11 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
   }
 
   Widget _buildOptionalField(
-      TextEditingController controller,
-      String label, {
-        int maxLines = 1,
-        TextInputType keyboardType = TextInputType.text,
-      }) {
+    TextEditingController controller,
+    String label, {
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/di/di_container.dart';
-import '../../discounts/data/user_cubit.dart';
-import '../data/user_repository.dart';
+import '../data/user_cubit.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});

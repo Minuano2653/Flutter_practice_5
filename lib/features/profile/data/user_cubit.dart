@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../profile/models/user.dart';
+import '../models/user.dart';
 
 class UserCubit extends Cubit<User> {
   UserCubit()

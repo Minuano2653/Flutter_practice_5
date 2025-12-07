@@ -3,12 +3,9 @@ import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/di/di_container.dart';
 import '../../discounts/data/discounts_cubit.dart';
-import '../../discounts/data/discounts_repository.dart';
-import '../../discounts/data/user_cubit.dart';
+import '../data/user_cubit.dart';
 import '../../discounts/models/discount.dart';
-import '../data/user_repository.dart';
 import '../models/user.dart';
 
 class ProfileScreen extends StatefulWidget {

@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../shared/widgets/discount_image.dart';
 import '../data/discounts_cubit.dart';
-import '../data/user_cubit.dart';
+import '../../profile/data/user_cubit.dart';
 import '../models/discount.dart';
 
 class DiscountDetailsScreen extends StatelessWidget {
