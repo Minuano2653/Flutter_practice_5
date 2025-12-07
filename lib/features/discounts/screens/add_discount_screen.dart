@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/di/di_container.dart';
 import '../../profile/data/user_repository.dart';
+import '../data/discounts_cubit.dart';
 import '../data/discounts_repository.dart';
+import '../data/user_cubit.dart';
 import '../models/discount.dart';
 
 class AddDiscountScreen extends StatefulWidget {
@@ -20,21 +23,13 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
   final _descriptionController = TextEditingController();
   final _imageUrlController = TextEditingController();
 
-  late final DiscountsRepository _discountsRepository;
-  late final UserRepository _userRepository;
-
-  @override
-  void initState() {
-    super.initState();
-    _discountsRepository = getIt<DiscountsRepository>();
-    _userRepository = getIt<UserRepository>();
-  }
-
   void _save() {
     if (_formKey.currentState!.validate()) {
       final imageUrl = _imageUrlController.text.trim().isNotEmpty
           ? _imageUrlController.text.trim()
           : '';
+
+      final currentUser = context.read<UserCubit>().state;
 
       final newDiscount = Discount(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -43,13 +38,13 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
         oldPrice: _oldPriceController.text,
         imageUrl: imageUrl,
         storeName: _storeController.text,
-        author: _userRepository.currentUser,
+        author: currentUser,
         description: _descriptionController.text,
         isInFavourites: false,
         createdAt: DateTime.now(),
       );
 
-      _discountsRepository.addDiscount(newDiscount);
+      context.read<DiscountsCubit>().addDiscount(newDiscount);
       Navigator.pop(context);
     }
   }
@@ -79,9 +74,11 @@ class _AddDiscountScreenState extends State<AddDiscountScreen> {
             children: [
               _buildTextField(_titleController, 'Название публикации'),
               const SizedBox(height: 12),
-              _buildTextField(_newPriceController, 'Новая цена', keyboardType: TextInputType.number),
+              _buildTextField(_newPriceController, 'Новая цена',
+                  keyboardType: TextInputType.number),
               const SizedBox(height: 12),
-              _buildTextField(_oldPriceController, 'Старая цена', keyboardType: TextInputType.number),
+              _buildTextField(_oldPriceController, 'Старая цена',
+                  keyboardType: TextInputType.number),
               const SizedBox(height: 12),
               _buildTextField(_storeController, 'Магазин'),
               const SizedBox(height: 12),

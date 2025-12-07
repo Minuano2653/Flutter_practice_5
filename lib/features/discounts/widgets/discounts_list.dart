@@ -6,22 +6,24 @@ import '../../../shared/widgets/discount_item.dart';
 
 class DiscountsList extends StatelessWidget {
   final List<Discount> discounts;
-  final ValueChanged<Discount> onDiscountTap;
-  final ValueChanged<String> onToggleFavourite;
-  final ValueChanged<String> onDelete;
+  final String currentUserId;
+  final ValueChanged<Discount>? onDiscountTap;
+  final ValueChanged<String>? onToggleFavourite;
+  final ValueChanged<String>? onDelete;
 
   const DiscountsList({
     super.key,
     required this.discounts,
-    required this.onDiscountTap,
-    required this.onToggleFavourite,
-    required this.onDelete
+    required this.currentUserId,
+    this.onDiscountTap,
+    this.onToggleFavourite,
+    this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     if (discounts.isEmpty) {
-      return EmptyState();
+      return const EmptyState();
     }
 
     return ListView.separated(
@@ -29,12 +31,19 @@ class DiscountsList extends StatelessWidget {
       itemCount: discounts.length,
       itemBuilder: (context, index) {
         final discount = discounts[index];
+        final isSelf = discount.author.id == currentUserId;
+
         return DiscountItem(
           key: ValueKey(discount.id),
           discount: discount,
-          onTap: (dsk) => onDiscountTap(dsk),
-          onToggleFavourite: onToggleFavourite,
-          onDelete: onDelete,
+          isSelf: isSelf,
+          onTap: onDiscountTap != null ? () => onDiscountTap!(discount) : null,
+          onToggleFavourite: onToggleFavourite != null
+              ? () => onToggleFavourite!(discount.id)
+              : null,
+          onDelete: (isSelf && onDelete != null)
+              ? () => onDelete!(discount.id)
+              : null,
         );
       },
       separatorBuilder: (context, index) => const SizedBox(height: 12),

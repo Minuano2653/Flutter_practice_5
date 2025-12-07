@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/di/di_container.dart';
+import '../../discounts/data/user_cubit.dart';
 import '../data/user_repository.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -12,14 +14,13 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _avatarController;
-  late final UserRepository _userRepository;
 
   @override
   void initState() {
     super.initState();
-    _userRepository = getIt<UserRepository>();
-    _nameController = TextEditingController(text: _userRepository.currentUser.name);
-    _avatarController = TextEditingController(text: _userRepository.currentUser.avatarUrl);
+    final currentUser = context.read<UserCubit>().state;
+    _nameController = TextEditingController(text: currentUser.name);
+    _avatarController = TextEditingController(text: currentUser.avatarUrl);
   }
 
   @override
@@ -45,11 +46,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return;
     }
 
-    final updatedUser = _userRepository.currentUser.copyWith(
+    final currentUser = context.read<UserCubit>().state;
+    final updatedUser = currentUser.copyWith(
       name: name,
       avatarUrl: avatar,
     );
-    _userRepository.updateUser(updatedUser);
+    context.read<UserCubit>().updateUser(updatedUser);
 
     Navigator.pop(context);
   }

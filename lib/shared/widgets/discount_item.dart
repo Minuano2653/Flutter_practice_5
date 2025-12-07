@@ -1,32 +1,31 @@
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
-import '../../core/di/di_container.dart';
 import '../../features/discounts/models/discount.dart';
-import '../../features/profile/data/user_repository.dart';
 import 'discount_image.dart';
 
 class DiscountItem extends StatelessWidget {
   final Discount discount;
-  final ValueChanged<Discount> onTap;
-  final ValueChanged<String> onToggleFavourite;
-  final ValueChanged<String> onDelete;
+  final bool isSelf;
+  final VoidCallback? onTap;
+  final VoidCallback? onToggleFavourite;
+  final VoidCallback? onDelete;
 
   const DiscountItem({
     super.key,
     required this.discount,
-    required this.onTap,
-    required this.onToggleFavourite,
-    required this.onDelete,
+    this.isSelf = false,
+    this.onTap,
+    this.onToggleFavourite,
+    this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userRepository = getIt<UserRepository>();
 
     return InkWell(
-      onTap: () => onTap(discount),
+      onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
@@ -60,15 +59,14 @@ class DiscountItem extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (discount.author.id == userRepository.currentUser.id)
+                      if (isSelf && onDelete != null)
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                          onPressed: () => onDelete(discount.id),
+                          onPressed: onDelete,
                         ),
                     ],
                   ),
                   const SizedBox(height: 4),
-
                   Text(
                     discount.title,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -76,7 +74,6 @@ class DiscountItem extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-
                   Row(
                     children: [
                       Text(
@@ -123,7 +120,6 @@ class DiscountItem extends StatelessWidget {
                     style: theme.textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 10),
-
                   Row(
                     children: [
                       AvatarImage(imageUrl: discount.author.avatarUrl, radius: 40),
@@ -136,17 +132,18 @@ class DiscountItem extends StatelessWidget {
                           ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () => onToggleFavourite(discount.id),
-                        icon: Icon(
-                          discount.isInFavourites
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          color: discount.isInFavourites
-                              ? Colors.orange
-                              : Colors.grey,
+                      if (onToggleFavourite != null)
+                        IconButton(
+                          onPressed: onToggleFavourite,
+                          icon: Icon(
+                            discount.isInFavourites
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: discount.isInFavourites
+                                ? Colors.orange
+                                : Colors.grey,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ],
@@ -158,5 +155,3 @@ class DiscountItem extends StatelessWidget {
     );
   }
 }
-
-
