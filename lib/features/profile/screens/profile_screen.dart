@@ -1,126 +1,113 @@
-import 'package:fl_prac_5/features/discounts/widgets/discounts_list.dart';
-import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../discounts/data/discounts_cubit.dart';
 import '../data/user_cubit.dart';
-import '../../discounts/models/discount.dart';
 import '../models/user.dart';
+import '../../../shared/widgets/avatar_image.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<UserCubit, User>(
       builder: (context, currentUser) {
-        return BlocBuilder<DiscountsCubit, List<Discount>>(
-          builder: (context, discounts) {
-            final favouriteDiscounts =
-            discounts.where((d) => d.isInFavourites).toList();
-            final myDiscounts = discounts
-                .where((d) => d.author.id == currentUser.id)
-                .toList();
+        final theme = Theme.of(context);
 
-            final theme = Theme.of(context);
-
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text('Мой профиль'),
-                bottom: TabBar(
-                  controller: _tabController,
-                  tabs: const [
-                    Tab(text: 'Избранное'),
-                    Tab(text: 'Мои публикации'),
-                  ],
-                ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () async {
-                      await context.push('/profile/edit');
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.logout),
-                    onPressed: () {
-                      context.go('/login');
-                    },
-                  )
-                ],
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Мой профиль'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () => context.push('/profile/edit'),
               ),
-              body: Column(
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () => context.go('/login'),
+              ),
+            ],
+          ),
+          body: Column(
+            children: [
+              const SizedBox(height: 24),
+
+              // Информация о пользователе
+              Row(
                 children: [
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      const SizedBox(width: 16),
-                      AvatarImage(imageUrl: currentUser.avatarUrl, radius: 80),
-                      const SizedBox(width: 16),
-                      Text(
-                        currentUser.name,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(height: 1),
+                  const SizedBox(width: 16),
+                  AvatarImage(imageUrl: currentUser.avatarUrl, radius: 80),
+                  const SizedBox(width: 16),
                   Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _buildDiscountList(favouriteDiscounts, currentUser.id),
-                        _buildDiscountList(myDiscounts, currentUser.id),
-                      ],
+                    child: Text(
+                      currentUser.name,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 16),
                 ],
               ),
-            );
-          },
+              const SizedBox(height: 24),
+              const Divider(height: 1),
+              const SizedBox(height: 8),
+
+              // Список пунктов меню
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.favorite,
+                      title: 'Избранные скидки',
+                      onTap: () => context.push('/profile/favourites'),
+                    ),
+                    const Divider(height: 1),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.forum_outlined,
+                      title: 'Избранные обсуждения',
+                      onTap: () => context.push('/profile/favourite-discussions'),
+                    ),
+                    const Divider(height: 1),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.local_offer,
+                      title: 'Мои скидки',
+                      onTap: () => context.push('/profile/my-discounts'),
+                    ),
+                    const Divider(height: 1),
+                    _buildMenuItem(
+                      context: context,
+                      icon: Icons.forum,
+                      title: 'Мои обсуждения',
+                      onTap: () => context.push('/profile/my-discussions'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildDiscountList(List<Discount> discounts, String currentUserId) {
-    if (discounts.isEmpty) {
-      return const Center(child: Text('Список пуст'));
-    }
-
-    return DiscountsList(
-      discounts: discounts,
-      currentUserId: currentUserId,
-      onDiscountTap: (discount) => context.push('/discounts/${discount.id}'),
-      onToggleFavourite: (id) {
-        context.read<DiscountsCubit>().toggleFavourite(id);
-      },
-      onDelete: (id) {
-        context.read<DiscountsCubit>().deleteDiscount(id);
-      },
+  Widget _buildMenuItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      onTap: onTap,
     );
   }
 }

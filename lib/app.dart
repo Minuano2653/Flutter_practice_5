@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/router/app_router.dart';
 import 'features/discounts/data/discounts_cubit.dart';
+import 'features/discussions/data/discussions_cubit.dart';
 import 'features/profile/data/user_cubit.dart';
 
 class MyApp extends StatelessWidget {
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => UserCubit()),
         BlocProvider(create: (_) => DiscountsCubit()),
+        BlocProvider(create: (_) => DiscussionsCubit()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

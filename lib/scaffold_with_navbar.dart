@@ -11,7 +11,7 @@ class ScaffoldWithNavBar extends StatefulWidget {
 
 class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
   int _selectedIndex = 0;
-  final tabs = ['/discounts', '/profile'];
+  final tabs = ['/discounts', '/discussions', '/profile'];
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
@@ -29,6 +29,10 @@ class _ScaffoldWithNavBarState extends State<ScaffoldWithNavBar> {
           BottomNavigationBarItem(
             icon: Icon(Icons.local_offer_outlined),
             label: 'Скидки',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.forum_outlined),
+            label: 'Обсуждения',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
