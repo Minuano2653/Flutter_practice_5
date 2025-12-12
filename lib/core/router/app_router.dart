@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../../features/comments/screens/comments_screen.dart';
 import '../../features/discounts/screens/add_edit_discount_screen.dart';
 import '../../features/discounts/screens/discount_details_screen.dart';
 import '../../features/discounts/screens/discounts_list_screen.dart';
@@ -42,6 +43,20 @@ class AppRouter {
                   final id = state.pathParameters['id']!;
                   return DiscountDetailsScreen(discountId: id);
                 },
+                routes: [
+                  GoRoute(
+                    path: 'comments',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      final extra = state.extra as Map<String, dynamic>? ?? {};
+                      final title = extra['title'] as String? ?? 'Скидка';
+                      return CommentsScreen.forDiscount(
+                        discountId: id,
+                        discountTitle: title,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -66,6 +81,20 @@ class AppRouter {
                   final id = state.pathParameters['id']!;
                   return DiscussionDetailsScreen(discussionId: id);
                 },
+                routes: [
+                  GoRoute(
+                    path: 'comments',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      final extra = state.extra as Map<String, dynamic>? ?? {};
+                      final title = extra['title'] as String? ?? 'Обсуждение';
+                      return CommentsScreen.forDiscussion(
+                        discussionId: id,
+                        discussionTitle: title,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

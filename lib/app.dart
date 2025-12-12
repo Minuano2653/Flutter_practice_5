@@ -1,3 +1,4 @@
+import 'package:fl_prac_5/features/comments/data/comments_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/router/app_router.dart';
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => UserCubit()),
         BlocProvider(create: (_) => DiscountsCubit()),
         BlocProvider(create: (_) => DiscussionsCubit()),
+        BlocProvider(create: (_) => CommentsCubit()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

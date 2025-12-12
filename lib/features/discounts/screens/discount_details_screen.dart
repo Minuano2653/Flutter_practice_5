@@ -1,4 +1,3 @@
-import 'package:fl_prac_5/features/discounts/widgets/discount_rating_widget.dart';
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import '../../../shared/widgets/discount_image.dart';
 import '../data/discounts_cubit.dart';
 import '../../profile/data/user_cubit.dart';
 import '../models/discount.dart';
+import '../widgets/discount_rating_widget.dart';
 
 class DiscountDetailsScreen extends StatelessWidget {
   final String discountId;
@@ -42,6 +42,18 @@ class DiscountDetailsScreen extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Информация о скидке'),
             actions: [
+              IconButton(
+                onPressed: () {
+                  context.push(
+                    '/discounts/$discountId/comments',
+                    extra: {
+                      'title': discount.title,
+                      'type': 'discount',
+                    },
+                  );
+                },
+                icon: const Icon(Icons.comment_outlined),
+              ),
               if (isSelf) ...[
                 IconButton(
                   onPressed: () {

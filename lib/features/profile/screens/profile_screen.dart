@@ -22,17 +22,13 @@ class ProfileScreen extends StatelessWidget {
                 icon: const Icon(Icons.edit),
                 onPressed: () => context.push('/profile/edit'),
               ),
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () => context.go('/login'),
-              ),
             ],
           ),
           body: Column(
             children: [
               const SizedBox(height: 24),
 
-              // Информация о пользователе
+              // Информация пользователя
               Row(
                 children: [
                   const SizedBox(width: 16),
@@ -49,6 +45,7 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(width: 16),
                 ],
               ),
+
               const SizedBox(height: 24),
               const Divider(height: 1),
               const SizedBox(height: 8),
@@ -84,6 +81,10 @@ class ProfileScreen extends StatelessWidget {
                       title: 'Мои обсуждения',
                       onTap: () => context.push('/profile/my-discussions'),
                     ),
+
+                    // --- красная кнопка выхода ---
+                    const Divider(height: 1),
+                    _buildLogoutItem(context),
                   ],
                 ),
               ),
@@ -94,6 +95,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  // Стандартный пункт меню
   Widget _buildMenuItem({
     required BuildContext context,
     required IconData icon,
@@ -108,6 +110,49 @@ class ProfileScreen extends StatelessWidget {
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
       onTap: onTap,
+    );
+  }
+
+  // Красная кнопка "Выйти"
+  Widget _buildLogoutItem(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.logout, color: Colors.red),
+      title: const Text(
+        'Выйти',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.red,
+        ),
+      ),
+      onTap: () async {
+        final shouldLogout = await showDialog<bool>(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              title: const Text('Вы уверены?'),
+              content: const Text('Вы действительно хотите выйти из аккаунта?'),
+              actions: [
+                TextButton(
+                  child: const Text('Отмена'),
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                ),
+                TextButton(
+                  child: const Text(
+                    'Выйти',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (shouldLogout == true) {
+          context.go('/login');
+        }
+      },
     );
   }
 }

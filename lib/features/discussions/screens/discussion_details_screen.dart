@@ -83,6 +83,18 @@ class _DiscussionDetailsScreenState extends State<DiscussionDetailsScreen> {
             actions: [
               IconButton(
                 onPressed: () {
+                  context.push(
+                    '/discussions/${widget.discussionId}/comments',
+                    extra: {
+                      'title': discussion.title,
+                      'type': 'discussion',
+                    },
+                  );
+                },
+                icon: const Icon(Icons.comment_outlined),
+              ),
+              IconButton(
+                onPressed: () {
                   context.read<DiscussionsCubit>().toggleFavourite(discussion.id);
                 },
                 icon: Icon(
