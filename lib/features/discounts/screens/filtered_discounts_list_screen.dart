@@ -55,6 +55,7 @@ class FilteredDiscountsScreen extends StatelessWidget {
       body: BlocBuilder<DiscountsCubit, List<Discount>>(
         builder: (context, discounts) {
           final currentUserId = context.read<UserCubit>().state.id;
+          final cubit = context.read<DiscountsCubit>();
           final filteredDiscounts = _filterDiscounts(discounts, currentUserId);
 
           if (filteredDiscounts.isEmpty) {
@@ -71,10 +72,16 @@ class FilteredDiscountsScreen extends StatelessWidget {
             currentUserId: currentUserId,
             onDiscountTap: (discount) => context.push('/discounts/${discount.id}'),
             onToggleFavourite: (id) {
-              context.read<DiscountsCubit>().toggleFavourite(id);
+              cubit.toggleFavourite(id);
             },
             onDelete: (id) {
-              context.read<DiscountsCubit>().deleteDiscount(id);
+              cubit.deleteDiscount(id);
+            },
+            onUpvote: (id) {
+              cubit.upvoteDiscount(id);
+            },
+            onDownvote: (id) {
+              cubit.downvoteDiscount(id);
             },
           );
         },

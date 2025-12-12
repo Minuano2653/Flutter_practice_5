@@ -66,16 +66,16 @@ class ProfileScreen extends StatelessWidget {
                     const Divider(height: 1),
                     _buildMenuItem(
                       context: context,
-                      icon: Icons.forum_outlined,
-                      title: 'Избранные обсуждения',
-                      onTap: () => context.push('/profile/favourite-discussions'),
+                      icon: Icons.local_offer,
+                      title: 'Мои скидки',
+                      onTap: () => context.push('/profile/my-discounts'),
                     ),
                     const Divider(height: 1),
                     _buildMenuItem(
                       context: context,
-                      icon: Icons.local_offer,
-                      title: 'Мои скидки',
-                      onTap: () => context.push('/profile/my-discounts'),
+                      icon: Icons.forum_outlined,
+                      title: 'Избранные обсуждения',
+                      onTap: () => context.push('/profile/favourite-discussions'),
                     ),
                     const Divider(height: 1),
                     _buildMenuItem(

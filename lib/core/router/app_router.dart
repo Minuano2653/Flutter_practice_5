@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 
-import '../../features/discounts/screens/add_discount_screen.dart';
+import '../../features/discounts/screens/add_edit_discount_screen.dart';
 import '../../features/discounts/screens/discount_details_screen.dart';
 import '../../features/discounts/screens/discounts_list_screen.dart';
 import '../../features/discounts/screens/filtered_discounts_list_screen.dart';
@@ -27,7 +27,14 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: 'add',
-                builder: (context, state) => const AddDiscountScreen(),
+                builder: (context, state) => const AddEditDiscountScreen(),
+              ),
+              GoRoute(
+                path: 'edit/:id',
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return AddEditDiscountScreen(discountId: id);
+                },
               ),
               GoRoute(
                 path: ':id',

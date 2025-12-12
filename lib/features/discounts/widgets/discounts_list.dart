@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/empty_state.dart';
 import '../models/discount.dart';
-import '../../../shared/widgets/discount_item.dart';
+import 'discount_item.dart';
 
 class DiscountsList extends StatelessWidget {
   final List<Discount> discounts;
@@ -10,6 +10,8 @@ class DiscountsList extends StatelessWidget {
   final ValueChanged<Discount>? onDiscountTap;
   final ValueChanged<String>? onToggleFavourite;
   final ValueChanged<String>? onDelete;
+  final ValueChanged<String>? onUpvote;
+  final ValueChanged<String>? onDownvote;
 
   const DiscountsList({
     super.key,
@@ -18,6 +20,8 @@ class DiscountsList extends StatelessWidget {
     this.onDiscountTap,
     this.onToggleFavourite,
     this.onDelete,
+    this.onUpvote,
+    this.onDownvote,
   });
 
   @override
@@ -43,6 +47,12 @@ class DiscountsList extends StatelessWidget {
               : null,
           onDelete: (isSelf && onDelete != null)
               ? () => onDelete!(discount.id)
+              : null,
+          onUpvote: onUpvote != null
+              ? () => onUpvote!(discount.id)
+              : null,
+          onDownvote: onDownvote != null
+              ? () => onDownvote!(discount.id)
               : null,
         );
       },

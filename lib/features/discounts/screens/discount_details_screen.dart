@@ -1,7 +1,9 @@
+import 'package:fl_prac_5/features/discounts/widgets/discount_rating_widget.dart';
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/discount_image.dart';
 import '../data/discounts_cubit.dart';
@@ -40,7 +42,13 @@ class DiscountDetailsScreen extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Информация о скидке'),
             actions: [
-              if (isSelf)
+              if (isSelf) ...[
+                IconButton(
+                  onPressed: () {
+                    context.push('/discounts/edit/$discountId');
+                  },
+                  icon: const Icon(Icons.edit),
+                ),
                 IconButton(
                   onPressed: () {
                     context.read<DiscountsCubit>().deleteDiscount(discountId);
@@ -48,6 +56,7 @@ class DiscountDetailsScreen extends StatelessWidget {
                   },
                   icon: const Icon(Icons.delete),
                 ),
+              ],
             ],
           ),
           body: SingleChildScrollView(
@@ -78,11 +87,11 @@ class DiscountDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildDiscountCard(
-    BuildContext context,
-    Discount discount,
-    double discountPercent,
-    ThemeData theme,
-  ) {
+      BuildContext context,
+      Discount discount,
+      double discountPercent,
+      ThemeData theme,
+      ) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -101,6 +110,33 @@ class DiscountDetailsScreen extends StatelessWidget {
                 theme,
               ),
             ),
+            const SizedBox(width: 16),
+            // Колонка с виджетом рейтинга и кнопкой избранного
+            Column(
+              children: [
+                DiscountRatingWidget(
+                  rating: discount.rating,
+                  onUpvote: () {
+                    context.read<DiscountsCubit>().upvoteDiscount(discount.id);
+                  },
+                  onDownvote: () {
+                    context.read<DiscountsCubit>().downvoteDiscount(discount.id);
+                  },
+                  isCompact: false,
+                ),
+                const SizedBox(height: 12),
+                IconButton(
+                  onPressed: () {
+                    context.read<DiscountsCubit>().toggleFavourite(discountId);
+                  },
+                  icon: Icon(
+                    discount.isInFavourites ? Icons.favorite : Icons.favorite_border,
+                    color: discount.isInFavourites ? Colors.orange : Colors.grey,
+                    size: 30,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -108,11 +144,11 @@ class DiscountDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildDiscountInfo(
-    BuildContext context,
-    Discount discount,
-    double discountPercent,
-    ThemeData theme,
-  ) {
+      BuildContext context,
+      Discount discount,
+      double discountPercent,
+      ThemeData theme,
+      ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -191,16 +227,6 @@ class DiscountDetailsScreen extends StatelessWidget {
             style: Theme.of(
               context,
             ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-          ),
-        ),
-        IconButton(
-          onPressed: () {
-            context.read<DiscountsCubit>().toggleFavourite(discountId);
-          },
-          icon: Icon(
-            discount.isInFavourites ? Icons.favorite : Icons.favorite_border,
-            color: discount.isInFavourites ? Colors.orange : Colors.grey,
-            size: 30,
           ),
         ),
       ],

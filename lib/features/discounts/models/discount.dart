@@ -11,6 +11,7 @@ class Discount {
   final String description;
   final bool isInFavourites;
   final DateTime createdAt;
+  final int rating;
 
   Discount({
     required this.id,
@@ -23,6 +24,7 @@ class Discount {
     required this.description,
     required this.isInFavourites,
     required this.createdAt,
+    this.rating = 0,
   });
 
   Discount copyWith({
@@ -36,6 +38,7 @@ class Discount {
     String? description,
     bool? isInFavourites,
     DateTime? createdAt,
+    int? rating,
   }) {
     return Discount(
       id: id ?? this.id,
@@ -48,7 +51,7 @@ class Discount {
       description: description ?? this.description,
       isInFavourites: isInFavourites ?? this.isInFavourites,
       createdAt: createdAt ?? this.createdAt,
+      rating: rating ?? this.rating,
     );
   }
-
 }

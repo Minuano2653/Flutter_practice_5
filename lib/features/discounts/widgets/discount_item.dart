@@ -1,8 +1,9 @@
+import 'package:fl_prac_5/features/discounts/widgets/discount_rating_widget.dart';
 import 'package:fl_prac_5/shared/extensions/format_date.dart';
 import 'package:fl_prac_5/shared/widgets/avatar_image.dart';
 import 'package:flutter/material.dart';
-import '../../features/discounts/models/discount.dart';
-import 'discount_image.dart';
+import '../models/discount.dart';
+import '../../../shared/widgets/discount_image.dart';
 
 class DiscountItem extends StatelessWidget {
   final Discount discount;
@@ -10,6 +11,8 @@ class DiscountItem extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onToggleFavourite;
   final VoidCallback? onDelete;
+  final VoidCallback? onUpvote;
+  final VoidCallback? onDownvote;
 
   const DiscountItem({
     super.key,
@@ -18,6 +21,8 @@ class DiscountItem extends StatelessWidget {
     this.onTap,
     this.onToggleFavourite,
     this.onDelete,
+    this.onUpvote,
+    this.onDownvote,
   });
 
   @override
@@ -31,11 +36,11 @@ class DiscountItem extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           color: theme.colorScheme.surface,
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
               blurRadius: 4,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
             ),
           ],
         ),
@@ -59,11 +64,6 @@ class DiscountItem extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (isSelf && onDelete != null)
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                          onPressed: onDelete,
-                        ),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -91,16 +91,14 @@ class DiscountItem extends StatelessWidget {
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsetsGeometry.directional(
+                      const Padding(
+                        padding: EdgeInsetsDirectional.only(
                           start: 6,
                           end: 6,
                         ),
                         child: Text(
                           "|",
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey,
-                          ),
+                          style: TextStyle(color: Colors.grey),
                         ),
                       ),
                       Text(
@@ -132,22 +130,36 @@ class DiscountItem extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (onToggleFavourite != null)
-                        IconButton(
-                          onPressed: onToggleFavourite,
-                          icon: Icon(
-                            discount.isInFavourites
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: discount.isInFavourites
-                                ? Colors.orange
-                                : Colors.grey,
-                          ),
-                        ),
                     ],
                   ),
                 ],
               ),
+            ),
+            const SizedBox(width: 8),
+            // Колонка с виджетом рейтинга и кнопкой избранного
+            Column(
+              children: [
+                DiscountRatingWidget(
+                  rating: discount.rating,
+                  onUpvote: onUpvote,
+                  onDownvote: onDownvote,
+                  isCompact: true,
+                ),
+                if (onToggleFavourite != null) ...[
+                  const SizedBox(height: 8),
+                  IconButton(
+                    onPressed: onToggleFavourite,
+                    icon: Icon(
+                      discount.isInFavourites
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: discount.isInFavourites
+                          ? Colors.orange
+                          : Colors.grey,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ],
         ),

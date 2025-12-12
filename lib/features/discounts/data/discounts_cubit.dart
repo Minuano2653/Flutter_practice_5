@@ -46,6 +46,7 @@ class DiscountsCubit extends Cubit<List<Discount>> {
             '\n- Высококачественные материалы обеспечивают устойчивость и долговечность, выдерживая ежедневные нагрузки. Наша компания импортирует и дистрибутирует исключительно opигинальные товары, о чем свидетельствуют договоры и сертификаты на продукцию. Мы специализируемся на оптовой и розничной продаже товаров всемирно известных брендов. Весь товар поставляется с opигинальными ярлыками, бирками и этикетками, на упаковке присутствует наклейка со штрих кодом и артикулом товара, который совпадает с артикулом на внутренних ярлыках товара. Все товары, подлежащие обязательной маркировке, занесены в систему Честный знак',
         isInFavourites: false,
         createdAt: DateTime.now().subtract(const Duration(hours: 5)),
+        rating: 15,
       ),
       Discount(
         id: 'd2',
@@ -59,6 +60,7 @@ class DiscountsCubit extends Cubit<List<Discount>> {
         description: 'Флагманские наушники с шумоподавлением.',
         isInFavourites: true,
         createdAt: DateTime.now().subtract(const Duration(days: 1, hours: 3)),
+        rating: 8,
       ),
       Discount(
         id: 'd3',
@@ -73,6 +75,7 @@ class DiscountsCubit extends Cubit<List<Discount>> {
         'Автоматическая кофемашина с капучинатором и регулировкой помола.',
         isInFavourites: false,
         createdAt: DateTime.now().subtract(const Duration(days: 2, hours: 2)),
+        rating: 25,
       ),
     ];
 
@@ -87,6 +90,10 @@ class DiscountsCubit extends Cubit<List<Discount>> {
     emit(state.where((d) => d.id != id).toList());
   }
 
+  void updateDiscount(Discount discount) {
+    emit(state.map((d) => d.id == discount.id ? discount : d).toList());
+  }
+
   void toggleFavourite(String id) {
     emit(
       state.map((d) {
@@ -96,6 +103,43 @@ class DiscountsCubit extends Cubit<List<Discount>> {
         return d;
       }).toList(),
     );
+  }
+
+  // Новые методы для работы с рейтингом
+  void upvoteDiscount(String id) {
+    emit(
+      state.map((d) {
+        if (d.id == id) {
+          return d.copyWith(rating: d.rating + 1);
+        }
+        return d;
+      }).toList(),
+    );
+  }
+
+  void downvoteDiscount(String id) {
+    emit(
+      state.map((d) {
+        if (d.id == id) {
+          return d.copyWith(rating: d.rating - 1);
+        }
+        return d;
+      }).toList(),
+    );
+  }
+
+  // Получить список отсортированный по рейтингу (горячее)
+  List<Discount> getHotDiscounts() {
+    final list = List<Discount>.from(state);
+    list.sort((a, b) => b.rating.compareTo(a.rating));
+    return list;
+  }
+
+  // Получить список отсортированный по дате (новое)
+  List<Discount> getNewDiscounts() {
+    final list = List<Discount>.from(state);
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
   }
 
   Discount? getDiscountById(String id) {
